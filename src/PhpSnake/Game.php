@@ -50,15 +50,21 @@ class Game
 
 
                     $menu ->addComponentMenu(new MenuComponent('Zadanie','startGame'));
-                    $menu ->addComponentMenu(new MenuComponent('Opcje','test'));
-                    $menu ->addComponentMenu(new MenuComponent('Zapisz gre','test'));
-                    $menu ->addComponentMenu(new MenuComponent('Wyjscie','test'));
+                    $menu ->addComponentMenu(new MenuComponent('Opcje','newTextSide'));
+                    $menu ->addComponentMenu(new MenuComponent('Zapisz gre','newTextSide'));
+                    $menu ->addComponentMenu(new MenuComponent('Wyjscie','endGame'));
                     $menu ->drawMenu();
                     $this->drawBoard();
 
                 while(true)
                     {
-                        $menu->interactWithMenu();
+                        $input = $this->terminal->getChar();
+                    
+                        if($input != NULL)
+                        {
+                            $menu->interactWithMenu($input);
+                        }
+                        
                     }
             }
          catch (GameException $exception) {

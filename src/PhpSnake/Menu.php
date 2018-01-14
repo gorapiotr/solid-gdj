@@ -64,23 +64,22 @@ class Menu
         $this->board->writeStringOnBoard($menuComponent['name'],$menuComponentHeight);
     }
 
-    public function interactWithMenu()
+    public function interactWithMenu($char)
     {   
-        $input = $this->terminal->getChar();
+        
         foreach ($this->menuComponentsArray as $oneComponent) 
         {
-             if($oneComponent['key'] == $input)
+             if($oneComponent['key'] == $char)
              {
                 
                 call_user_func(array($this, $oneComponent['functionName']), $oneComponent['name']);
-                //call_user_func('Game:startGame');
 
              }
         }
     }
 
 
-  public function test($text)
+  public function newTextSide($text)
     {
                 $this->board->removeBoard();
                 $this->board->generateMap();
@@ -97,12 +96,22 @@ class Menu
             {
                 $input = $this->terminal->getChar();
 
-                //POWODUJE PORUSZANIE SIE WEZA
+                
                 $this->board->moveSnake($input);
 
                 $this->drawer->draw($this->board);
                 usleep(60000);
             }
+    }
+    ///Koniec gry
+    public function endGame($value =NULL)
+    {
+
+        $this->newTextSide("!!! Do zobaczenia !!!");
+        sleep(1);
+        system('clear');
+        exit();
+
     }
 
 
