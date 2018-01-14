@@ -173,14 +173,14 @@ class Board
         $this->map[$point->getRow()][$point->getCol()] = $point->getChar();
     }
 
-    private function generateMap()
+    public function generateMap()
     {
         for ($i = 0; $i < $this->height; ++$i) {
             $this->map[$i] = array_fill(0, $this->width, ' ');
         }
     }
 
-    private function generateOutline()
+    public function generateOutline()
     {
         $this->map[0][0] = Char::boxTopLeft();
         $this->map[0][$this->width - 1] = Char::boxTopRight();

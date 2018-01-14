@@ -36,7 +36,7 @@ class Game
 
 
         //POWODUJE POJAWIENIE SIE TABLICY
-        $this->drawBoard();
+        //$this->drawBoard();
     }
 
 
@@ -45,26 +45,20 @@ class Game
     public function run()
     {
         try {
-                    $menu = new Menu($this->board);
+                    system('clear');
+                    $menu = new Menu($this->board, $this->terminal);
 
 
-                    $menu ->addComponentMenu(new MenuComponent('Zadanie'));
-                    $menu ->addComponentMenu(new MenuComponent('Opcje'));
-                    $menu ->addComponentMenu(new MenuComponent('Zapisz gre'));
-                    $menu ->addComponentMenu(new MenuComponent('Wyjscie'));
+                    $menu ->addComponentMenu(new MenuComponent('Zadanie','startGame'));
+                    $menu ->addComponentMenu(new MenuComponent('Opcje','test'));
+                    $menu ->addComponentMenu(new MenuComponent('Zapisz gre','test'));
+                    $menu ->addComponentMenu(new MenuComponent('Wyjscie','test'));
                     $menu ->drawMenu();
                     $this->drawBoard();
 
                 while(true)
                     {
-                    
-                        $input = $this->terminal->getChar();
-
-                        //Jesli wcisnie k to start gry
-                        if($input=='k')
-                        {
-                            $this->startGame();
-                        }
+                        $menu->interactWithMenu();
                     }
             }
          catch (GameException $exception) {
@@ -84,18 +78,4 @@ class Game
         $this->drawer->draw($this->board);
     }
 
-    public function startGame()
-    {
-        while (true)
-            {
-                //POBRANIE ZNAKU
-                $input = $this->terminal->getChar();
-
-                //POWODUJE PORUSZANIE SIE WEZA
-                $this->board->moveSnake($input);
-
-                $this->drawBoard();
-                usleep(60000);
-            }
-    }
 }

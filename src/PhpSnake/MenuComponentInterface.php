@@ -11,9 +11,26 @@ abstract class MenuComponentInterface
      */
     private $name;
 
+    /**
+	 * @var string
+	 */
+    private $key;
+
+     /**
+     * @var string
+     */
+    private $functionName;
+
+
+
+
 
     abstract function getName();
 
+    abstract function getfunctionName();
 
+    abstract function setKey($key);
+
+    abstract function getKey();
 
 }
