@@ -1,0 +1,263 @@
+Piotr Góra,
+Wojciech Dunia,
+Marcin Jaskowski
+
+= Snake.php
+
+
+
+
+
+
+
+
+
+
+=== Przykład 1
+
+Przed refaktoryzacją metoda writeGameOver() była wywoływana bez argumentu. Wypisywała na konsoli informację o końcu gry. Metoda to była zamknięta na zmiany. Po refaktoryzacji metoda może zostać wykorzystana do wypisania dowolnego tekstu na ekranie. Bez paramerów low i column tekst będzie automatycznie wypisywany na środku. Jeśli argumenty zostaną podanę tekst wyświetli się w określonym miejscu. Pozwoli to na wielokrotne wykorzystanie tej metody.
+
+
+===== Przed refaktoryzacją 
+
+[source,php]
+----
+public function writeGameOver()
+    {
+        $text = 'GAME OVER';
+        $length = strlen($text);
+        $col = ($this->width / 2) - ($length / 2);
+        $row = $this->height / 2;
+
+        for ($i = 0; $i < $length; ++$i) {
+            $this->map[$row][$col] = $text[$i];
+            ++$col;
+        }
+    }
+----
+
+===== Po refaktoryzacji 
+
+[source,php]
+----
+public function writeStringOnBoard($text, $row = NULL , $column = NULL )
+    {
+        $length = strlen($text);
+        
+        if($row == NULL)
+            {
+                $row = $this->height / 2;
+            }
+        if($column == NULL)
+            {    
+                $column = ($this->width / 2) - ($length / 2);
+            }
+            
+        for ($i = 0; $i < $length; ++$i) 
+            {
+                $this->map[$row][$column] = $text[$i];
+                ++$column;
+            }
+    }
+----
+
+
+=== Przykład 2
+
+Dodanie menu. Przed refaktoryzacją aplikcja uwzględniała jeden tryb gry. Nie było możliwości dodawania nowych funkcjonalności. Za pomocą stworzonych klas takich jak: Menu.php, ComponentMenu.php. Umożliwiono Dodawanie dodatkowych komponentów za pomocą obieku Component menu.
+
+
+===== Główna pętla programu przed refaktoryzacją
+
+[source,php]
+----
+	
+public function run()
+     {
+        try 
+        {
+             while (true) {
+                 $input = $this->terminal->getChar();
+                 $this->board->moveSnake($input);
+                 $this->drawBoard();
+                 usleep(60000);
+             }
+         }
+         catch (GameException $exception)
+         {
+             $this->gameOver();
+         }
+     }
+----
+
+
+===== Główna pętla programu po refaktoryzacji
+
+
+[source,php]
+----
+public function run()
+    {
+        try 
+        {
+              system('clear');
+                    
+              $menu = new Menu($this->board, $this->terminal);
+              $menu ->addComponentMenu(new MenuComponent('Zadanie','startGame'));
+              $menu ->addComponentMenu(new MenuComponent('Opcje','newTextSide'));
+              $menu ->addComponentMenu(new MenuComponent('Zapisz gre','newTextSide'));
+              $menu ->addComponentMenu(new MenuComponent('Wyjscie','endGame'));
+                    
+              $menu ->drawMenu();
+              
+              $this->drawBoard();
+                    
+                while(true)
+                    {
+                        $input = $this->terminal->getChar();
+                    
+                        if($input != NULL)
+                        {
+                            $menu->interactWithMenu($input);
+                        }    
+                    }
+            }
+         catch (GameException $exception)
+         {
+            $this->gameOver();
+            $this->board->removeBoard();
+        }
+    }
+----
+
+
+===== Klasa MenuComponent.php(dziedziczy po interfejsie MenuComponentInterface.php)
+
+
+[source,php]
+----
+class MenuComponent extends MenuComponentInterface
+{
+    
+    ...
+    
+	public function __construct(string $name, string   $functionName)
+    {
+    	    $this->name = $name;
+            $this->functionName = $functionName;
+    }
+
+    ...
+
+}
+----
+
+
+===== Klasa Menu.php
+
+
+[source,php]
+----
+class Menu
+{
+
+    ...    
+        
+    public function addComponentMenu(MenuComponentInterface $menuComponent)
+    {
+       $this->menuComponentsArray[]=['name'=> $menuComponent->getName(), 
+                                     'key'=>$this->computeKeyComponentMenuValue(),
+                                     'functionName' => $menuComponent->getfunctionName()];
+        
+    }
+    
+    ...
+    
+}
+----
+
+[source,php]
+----
+class Menu
+{
+
+    ...    
+        
+    public function drawMenu()
+    {
+       
+        foreach ($this->menuComponentsArray as $oneComponent)
+        {
+            $this->positionMenu($oneComponent);
+        }
+        
+    }
+    
+    ...
+    
+}
+----
+
+[source,php]
+----
+class Menu
+{
+
+    ...    
+        
+    public function interactWithMenu($char)
+    {   
+        
+        foreach ($this->menuComponentsArray as $oneComponent) 
+        {
+             if($oneComponent['key'] == $char)
+             {
+                
+                call_user_func(array($this, $oneComponent['functionName']), $oneComponent['name']);
+             }
+        }
+    }
+    
+    ...
+    
+}
+----
+
+[source,php]
+----
+
+//Przykładowa instacja klasy MenuComponent korzystająca z funkcji "interactWithMenu()"
+// Object = new MenuComponent('Zacznij gre','startGame');
+
+
+class Menu
+{
+
+    ...    
+        
+    ///Rozpoczecie,gry
+    public function startGame()
+    {
+        while (true)
+            {
+                $input = $this->terminal->getChar();
+                
+                $this->board->moveSnake($input);
+                $this->drawer->draw($this->board);
+                usleep(60000);
+            }
+    }
+    
+    ...
+    
+}
+----
+
+
+
+
+
+
+
+
+
