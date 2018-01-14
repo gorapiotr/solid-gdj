@@ -6,6 +6,8 @@ namespace tests\PhpSnake;
 
 use PhpSnake\Terminal;
 
+//require __DIR__ .'/../../src/PhpSnake/Terminal.php';
+
 class TerminalTest extends \PHPUnit_Framework_TestCase
 {
     public function testTerminalMetrics()

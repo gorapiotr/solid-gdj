@@ -115,17 +115,39 @@ class Board
         return $this->map;
     }
 
-    public function writeGameOver()
+
+    /**Funcion writing a string on board 
+    *
+    */
+    public function writeStringOnBoard($text, $row = NULL , $column = NULL )
     {
-        $text = 'GAME OVER';
+
         $length = strlen($text);
-        $col = ($this->width / 2) - ($length / 2);
-        $row = $this->height / 2;
+
+        if($row == NULL)
+        {
+            $row = $this->height / 2;
+        }
+
+        if($column == NULL)
+        {    
+        $column = ($this->width / 2) - ($length / 2);
+        }
+
 
         for ($i = 0; $i < $length; ++$i) {
-            $this->map[$row][$col] = $text[$i];
-            ++$col;
+            $this->map[$row][$column] = $text[$i];
+            ++$column;
         }
+    }
+
+    /**Function clear console after 2 seconds
+    *
+    */
+    public function removeBoard()
+    {
+        sleep(2);
+        system('clear');
     }
 
     private function applyElements()

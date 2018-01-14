@@ -6,6 +6,8 @@ namespace test\PhpSnake\Game;
 
 use PhpSnake\Game\Board;
 
+//require __DIR__ . '/../../src/PhpSnake/Terminal.php';
+
 class BoardTest extends \PHPUnit_Framework_TestCase
 {
     public function testBoardConstruction()
