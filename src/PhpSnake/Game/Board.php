@@ -52,7 +52,8 @@ class Board
         $this->snake = new Snake($height, $width);
 
         // Nowy sposób generowania obiektów na ekranie
-        $this->randomObjectsOnBoard(new Coin(1, 1),1);
+        $this->randomObjectsOnBoard(new Coin(1, 2),1);
+        $this->randomObjectsOnBoard(new Bomb(2, 3),1);
 
         $this->generateMap();
         $this->generateOutline();
