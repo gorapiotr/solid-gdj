@@ -18,6 +18,9 @@ class Bomb extends Point
      * @var string
      */
     private $char = "*";
+    
+    private $factor = -1;
+    
     //private $char =  "\033[?25h\033[?0c";
 
      /**

@@ -91,7 +91,7 @@ class Board
                     $this->snake->advance();
                     unset($this->ObjectsOnBoard[$index]);
                     // Nowy sposób generowania obiektów na ekranie
-                    $this->randomObjectsOnBoard(new Coin(3, 4),1); 
+                    rand(0,1)==0 ? $this->randomObjects(new Coin(3, 4),1):$this->randomObjects(new Bomb(3, 4),1);
                 }
             }
         }

@@ -20,6 +20,8 @@ class Point
      * @var string
      */
     private $char;
+    
+    private $factor = 1;
 
     /**
      * @param int    $row
