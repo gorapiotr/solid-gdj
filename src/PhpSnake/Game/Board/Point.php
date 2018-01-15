@@ -28,9 +28,10 @@ class Point
      */
     public function __construct(int $row, int $col, string $char)
     {
-        $this->row = $row;
-        $this->col = $col;
-        $this->char = $char;
+        # $this->row = $row;
+        # $this->col = $col;
+        # $this->char = $char;
+        $this->setParams(['row'=>$row,'col'=>$col,'char'=>$char]);
     }
 
     /**
@@ -63,6 +64,13 @@ class Point
     public function setChar($char)
     {
         $this->char = $char;
+    }
+    
+    public function setParams(array $params)
+    {
+    	if (isset($params['row'])) $this->row = $params['row'];
+    	if (isset($params['col'])) $this->col = $params['col'];
+    	if (isset($params['char'])) $this->char = $params['char'];
     }
 
     /**
