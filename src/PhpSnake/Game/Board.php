@@ -7,6 +7,7 @@ namespace PhpSnake\Game;
 use PhpSnake\Game\Board\Coin;
 use PhpSnake\Game\Board\Point;
 use PhpSnake\Terminal\Char;
+use PhpSnake\Game\Board\Bomb;
 
 class Board
 {
