@@ -38,7 +38,7 @@ class Board
     /**
      * @var Coin[]:array
      */
-    private $coins;
+    # private $coins;
     
     /**
      * @var ObjectsOnBoard[]:array
@@ -57,7 +57,7 @@ class Board
         $this->snake = new Snake($height, $width);
 
         // Stary sposób generowania obiektów
-        $this->randomCoins(1);
+        # $this->randomCoins(1);
         // Nowy sposób generowania obiektów na ekranie
         $this->randomObjectsOnBoard(new Coin(1, 1),1);
 
@@ -68,15 +68,15 @@ class Board
         $this->applyElements();
     }
 
-    public function randomCoins(int $count)
+    /* public function randomCoins(int $count)
     {
         for ($i = 0; $i < $count; ++$i) {
             $col = rand(1, $this->width - 2);
             $row = rand(1, $this->height - 2);
 
-            $this->coins[] = new Coin($row, $col);
+            $this->ObjectsOnBoard[] = new Coin($row, $col);
         }
-    }
+    } */
     
     public function randomObjectsOnBoard(Point $Object, int $count)
     {
@@ -100,13 +100,13 @@ class Board
     {
         $head = $this->snake->getPoints()[0];
 
-        if (!empty($this->coins)) {
-            foreach ($this->coins as $index => $coin) {
+        if (!empty($this->ObjectsOnBoard)) {
+            foreach ($this->ObjectsOnBoard as $index => $coin) {
                 if ($head->overlaps($coin)) {
                     $this->snake->advance();
-                    unset($this->coins[$index]);
+                    unset($this->ObjectsOnBoard[$index]);
                     // Stary sposób generowania obiektów
-                    $this->randomCoins(1);
+                    # $this->randomCoins(1);
                     // Nowy sposób generowania obiektów na ekranie
                     $this->randomObjectsOnBoard(new Coin(3, 4),1); 
                 }
@@ -181,8 +181,8 @@ class Board
             $this->applyPoint($point);
         }
 
-        if (!empty($this->coins)) {
-            foreach ($this->coins as $coin) {
+        if (!empty($this->ObjectsOnBoard)) {
+            foreach ($this->ObjectsOnBoard as $coin) {
                 $this->applyPoint($coin);
             }
         }
