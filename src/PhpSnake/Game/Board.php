@@ -34,12 +34,7 @@ class Board
      * @var Snake
      */
     private $snake;
-
-    /**
-     * @var Coin[]:array
-     */
-    # private $coins;
-    
+  
     /**
      * @var ObjectsOnBoard[]:array
      */
@@ -56,8 +51,6 @@ class Board
 
         $this->snake = new Snake($height, $width);
 
-        // Stary sposób generowania obiektów
-        # $this->randomCoins(1);
         // Nowy sposób generowania obiektów na ekranie
         $this->randomObjectsOnBoard(new Coin(1, 1),1);
 
@@ -67,17 +60,7 @@ class Board
 
         $this->applyElements();
     }
-
-    /* public function randomCoins(int $count)
-    {
-        for ($i = 0; $i < $count; ++$i) {
-            $col = rand(1, $this->width - 2);
-            $row = rand(1, $this->height - 2);
-
-            $this->ObjectsOnBoard[] = new Coin($row, $col);
-        }
-    } */
-    
+   
     public function randomObjectsOnBoard(Point $Object, int $count)
     {
     	for ($i = 0; $i < $count; ++$i) {
@@ -92,21 +75,19 @@ class Board
     public function moveSnake(string $input)
     {
         $this->snake->move($input);
-        $this->checkCoins();
+        $this->checkObjects();
         $this->applyElements();
     }
 
-    private function checkCoins()
+    private function checkObjects()
     {
         $head = $this->snake->getPoints()[0];
 
         if (!empty($this->ObjectsOnBoard)) {
-            foreach ($this->ObjectsOnBoard as $index => $coin) {
-                if ($head->overlaps($coin)) {
+            foreach ($this->ObjectsOnBoard as $index => $object) {
+                if ($head->overlaps($object)) {
                     $this->snake->advance();
                     unset($this->ObjectsOnBoard[$index]);
-                    // Stary sposób generowania obiektów
-                    # $this->randomCoins(1);
                     // Nowy sposób generowania obiektów na ekranie
                     $this->randomObjectsOnBoard(new Coin(3, 4),1); 
                 }
@@ -182,8 +163,8 @@ class Board
         }
 
         if (!empty($this->ObjectsOnBoard)) {
-            foreach ($this->ObjectsOnBoard as $coin) {
-                $this->applyPoint($coin);
+            foreach ($this->ObjectsOnBoard as $object) {
+                $this->applyPoint($object);
             }
         }
     }
