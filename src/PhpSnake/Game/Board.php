@@ -55,7 +55,11 @@ class Board
         $this->height = $height;
 
         $this->snake = new Snake($height, $width);
+
+        // Stary sposób generowania obiektów
         $this->randomCoins(1);
+        // Nowy sposób generowania obiektów na ekranie
+        $this->randomObjectsOnBoard(new Coin(1, 1),1);
 
         $this->generateMap();
         $this->generateOutline();
@@ -79,8 +83,9 @@ class Board
     	for ($i = 0; $i < $count; ++$i) {
     		$col = rand(1, $this->width - 2);
     		$row = rand(1, $this->height - 2);
-    		
-    		$this->ObjectsOnBoard[] = $Object($row, $col);
+    		// Losowa aktualizacja położenia obiektu na ekranie
+    		$Object->setParams(['col'=>$col,'row'=>$row]);
+    		$this->ObjectsOnBoard[] = $Object; 
     	}
     }
 
@@ -100,7 +105,10 @@ class Board
                 if ($head->overlaps($coin)) {
                     $this->snake->advance();
                     unset($this->coins[$index]);
+                    // Stary sposób generowania obiektów
                     $this->randomCoins(1);
+                    // Nowy sposób generowania obiektów na ekranie
+                    $this->randomObjectsOnBoard(new Coin(3, 4),1); 
                 }
             }
         }
