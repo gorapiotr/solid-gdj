@@ -39,6 +39,11 @@ class Board
      * @var Coin[]:array
      */
     private $coins;
+    
+    /**
+     * @var ObjectsOnBoard[]:array
+     */
+    private $ObjectsOnBoard;
 
     /**
      * @param int $width
@@ -67,6 +72,16 @@ class Board
 
             $this->coins[] = new Coin($row, $col);
         }
+    }
+    
+    public function randomObjectsOnBoard(Point $Object, int $count)
+    {
+    	for ($i = 0; $i < $count; ++$i) {
+    		$col = rand(1, $this->width - 2);
+    		$row = rand(1, $this->height - 2);
+    		
+    		$this->ObjectsOnBoard[] = $Object($row, $col);
+    	}
     }
 
     public function moveSnake(string $input)
