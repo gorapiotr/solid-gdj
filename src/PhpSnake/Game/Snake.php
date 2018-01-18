@@ -41,14 +41,17 @@ class Snake
      */
     public function __construct(int $boardRows, int $boardCols)
     {
-        $head = new Point(intval($boardRows / 2), intval($boardCols / 2), Char::block());
-        $this->boardCols = $boardCols;
-        $this->boardRows = $boardRows;
-
-        for ($i = 1;$i < 5;++$i) {
-            $this->points[] = new Point($head->getRow(), $head->getCol() - $i, Char::shadeBlock());
-        }
-        array_unshift($this->points, $head);
+    	$head = new Point();
+    	$head->setParams(['row' => intval($boardRows / 2), 'col' => intval($boardCols / 2), 'char' => Char::block()]);
+    	$this->boardCols = $boardCols;
+    	$this->boardRows = $boardRows;
+    	
+    	for ($i = 1;$i < 5;++$i) {
+    		$body = new Point();
+    		$body->setParams(['row' => $head->getRow(), 'col' => $head->getCol() - $i, 'char' => Char::shadeBlock()]);
+    		$this->points[] = $body;
+    	}
+    	array_unshift($this->points, $head);
     }
 
     public function move(string $input)
@@ -86,7 +89,9 @@ class Snake
         }
 
         $this->points[0]->setChar(Char::shadeBlock());
-        $next = new Point($row, $col, Char::block());
+        $new_point = new Point(); 
+        $new_point->setParams(['row'=>$row, 'col'=>$col, 'char'=>Char::block()]); 
+        $next = $new_point; 
 
         $this->checkCollision($next);
 
