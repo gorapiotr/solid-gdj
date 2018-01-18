@@ -28,9 +28,8 @@ class Point
      * @param int    $col
      * @param string $char
      */
-    public function __construct(int $row=1, int $col=1, string $char='.')
+    public function __construct()
     {
-        $this->setParams(['row'=>$row,'col'=>$col,'char'=>$char]);
     }
 
     /**

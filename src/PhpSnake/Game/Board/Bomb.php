@@ -23,13 +23,9 @@ class Bomb extends Point
     
     //private $char =  "\033[?25h\033[?0c";
 
-     /**
-     * @param int $row
-     * @param int $col
-     */
-    public function __construct(int $row=1, int $col=1)
+    public function __construct()
     {
-       //$test= rand(0,2);
-        parent::__construct($row, $col, $this->char);
+    	parent::__construct();
+    	$this->setParams(['char'=>$this->char]);
     }
 }
