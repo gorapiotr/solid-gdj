@@ -27,7 +27,7 @@ class Bomb extends Point
      * @param int $row
      * @param int $col
      */
-    public function __construct(int $row, int $col)
+    public function __construct(int $row=1, int $col=1)
     {
        //$test= rand(0,2);
         parent::__construct($row, $col, $this->char);

@@ -53,8 +53,8 @@ class Board
         $this->snake = new Snake($height, $width);
 
         // Nowy sposób generowania obiektów na ekranie
-        $this->randomObjectsOnBoard(new Coin(1, 2),1);
-        $this->randomObjectsOnBoard(new Bomb(2, 3),1);
+        $this->randomObjectsOnBoard(new Coin(),1);
+        $this->randomObjectsOnBoard(new Bomb(),1);
 
         $this->generateMap();
         $this->generateOutline();
@@ -91,7 +91,7 @@ class Board
                     $this->snake->advance();
                     unset($this->ObjectsOnBoard[$index]);
                     // Nowy sposób generowania obiektów na ekranie
-                    rand(0,1)==0 ? $this->randomObjectsOnBoard(new Coin(3, 4),1):$this->randomObjectsOnBoard(new Bomb(3, 4),1);
+                    rand(0,1)==0 ? $this->randomObjectsOnBoard(new Coin(),1):$this->randomObjectsOnBoard(new Bomb(),1);
                 }
             }
         }
