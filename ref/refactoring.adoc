@@ -265,6 +265,8 @@ class Menu
 
 Refaktoryzacja ma na celu rozszerzenie możliwości programu o dodawanie dowolnych nowych obiektów na ekranie, dziedziczących właściwości po klasie Point. Obecnie program zakłada na sztywno tworzenie jednego obiektu o nazwie Coin.
 
+=== Stosujemy się do zasady podstawienia Liskov
+
 na bazie metody randomCoins, która tworzy na ekranie obiekt klasy Coin:
 
 .Board::randomCoins()
@@ -280,7 +282,13 @@ na bazie metody randomCoins, która tworzy na ekranie obiekt klasy Coin:
         }
     }
 ----
-tworzymy dodatkową, nową metodę, która będzie fabryką pojedynczych obiektów na planszy, oraz dodajemy zmienną instancyjną, będącą tablicą obiektów (starej metody nie ruszamy):
+tworzymy dodatkową, nową metodę, która będzie fabryką pojedynczych obiektów na planszy, oraz ostatecznie zastąpi metodę *randomCoins*. Metoda randomObjects OnBoard() będzie spełniać zasadę Liskov, dzięki czemu będzie w stanie obsłużyć dowolny obiekt dziedziczący po klasie Point. Dodajemy też zmienną instancyjną, będącą tablicą obiektów, która docelowo zastąpi tablicę $Coins:
+
+[TIP]
+.Wyjaśnienie
+====
+Nie chcę bezpośrednio aktualizować metody randomCoins(), gdyż wiązałoby się to z prowadzaniem zmian jednocześnie w wielu miejscach przez co nie da się wykonywać testów po każdej zmianie (linia po linii). 
+====
 
 .Board::randomObjectsOnBoard()
 [source,php]
@@ -306,9 +314,12 @@ tworzymy dodatkową, nową metodę, która będzie fabryką pojedynczych obiekt�
 
 
 [NOTE]
+.Punkt kontrolny
 ====
 Przeprowadzone testy nie wykazały błędów, przechodzimy do kolejnego etapu
 ====
+
+=== Otwieramy się na dynamiczne parametry
 
 w klasie Point przygotowujemy funkcję ustawiającą wstępne parametry obiektu, dzięki zastosowaniu tablicy, będzie można przekazywać specyficzne parametry, dostępne tylko dla danego typu obiektu na ekranie
 
@@ -339,6 +350,7 @@ podmieniamy w konstruktorze klasy dotychczasowy sposób ustawiania parametrów:
 <1> Przypisujemy parametry przez tablice, jest to zabieg potrzebny do zmiany parametów obiektu już po utworzeniu jego instancji, wcześniej nie było to możliwe
 
 [NOTE]
+.Punkt kontrolny
 ====
 Przeprowadzamy testy i przechodzimy do kolejnego etapu
 ====
@@ -414,14 +426,17 @@ W metodzie checkCoins, również dodajemy nowy sposób generowania obiektów
 <2> Nowy sposób dodawania dowolnego obiektu na planszy
 
 [NOTE]
+.Punkt kontrolny
 ====
 Przeprowadzamy testy. Ponieważ nie ma błędów, możemy przystąpić do ostatecznego etapu.
 ====
 
+=== Wchodzimy na wyższy poziom abstrakcji nazw metod i zmiennych
+
 Podmieniamy wszystkie wystąpienia dotychczasowej tablicy przechowującej obiekty na ekranie na nową
 
 [source,php]
----- 
+----
     // wszystkie
     $this->coins
     // zamieniamy na
@@ -429,6 +444,7 @@ Podmieniamy wszystkie wystąpienia dotychczasowej tablicy przechowującej obiekt
 ----
 
 [NOTE]
+.Punkt kontrolny
 ====
 Błędów brak, program działa prawidłowo. Od tego momentu działanie starych motod zostało zastąpione nowo utworzonymi.
 ====
@@ -438,7 +454,7 @@ Na poniższym listingu widać jeszcze, że należy zrefaktoryzować nazwy nieade
 
 .cała klasa Board
 [source,php]
----- 
+----
    <?php
 
 declare (strict_types = 1);
@@ -542,7 +558,7 @@ class Board
         $head = $this->snake->getPoints()[0];
 
         if (!empty($this->ObjectsOnBoard)) {
-            foreach ($this->ObjectsOnBoard as $index => $coin) //<2>  
+            foreach ($this->ObjectsOnBoard as $index => $coin) //<2>
             {
                 if ($head->overlaps($coin)) //<2>
                 {
@@ -694,7 +710,10 @@ class Board
 <1> Zastąpione i zakomentowane zmienne i metody
 <2> $coin i checkCoins() - do zastąpienia nowymi nazwami
 
+=== Testujemy otwartość na dopisanie klasy
+
 [IMPORTANT]
+.Osiągnieto ważny etap
 ====
 Błędów brak, program jest otwarty za dopisanie klasy zeprezentującej nowy obiekt na ekranie.
 ====
@@ -785,11 +804,178 @@ Dopisujemy wywołanie obiektu Bomb na ekranie
 ----
 <1> Po "zjedzeniu" obiektu przez węża, odnawiamy losowo obiekt
 
+.Punkt kontrolny
+[NOTE]
+====
+Program przechodzi testy i działa prawidłowo
+====
+
+=== Code Smell (Long Parameter List)
+
+Teraz możemy się pozbyć zbędnych parametrów w konstruktorach klas oraz zmienić przekazywane parametry na tablicę, dzięki której klasy obiektów będą otwarte na dopisywanie nowych zmiennych.
+
+W pierwszej kolejności tworzymy parametry konstruktorów opcjonalnymi przez przypisanie im domyślnych wartości.
+
+.Coint::__construct() i Bomb::__construct
+[source,php]
+----
+    # public function __construct(int $row, int $col)
+    public function __construct(int $row=1, int $col=1) // <1>
+    {
+        parent::__construct($row, $col, $this->char);
+    }
+----
+<1> Ustawione domyślne wartości parametrów
+
+Teraz można się pozbyć parametrów z klasy wyświetlających monety i bomby na ekranie
+
+.Board::__construct()
+[source,php]
+----
+    # Przed
+    # $this->randomObjectsOnBoard(new Coin(1, 2),1);
+    # $this->randomObjectsOnBoard(new Bomb(2, 3),1);
+    # Po
+    $this->randomObjectsOnBoard(new Coin(),1);
+    $this->randomObjectsOnBoard(new Bomb(),1);
+----
+
+.Punkt kontrolny
+[NOTE]
+====
+Program przechodzi testy i działa prawidłowo
+====
+
+Kolejnym krokiem jest dodanie tablicy parametrów do konstruktora klasy bazowej.
+W tym kroku ustawiamy też domyślne wartości parametrów *$row*, *$col*, *$char*, ponieważ są one aktualizowane już po utworzeniu obiektu.
+
+.Point::__construct()
+[source,php]
+----
+    # Przed refaktoryzacją
+    # public function __construct(int $row, int $col, string $char)
+    # {
+    #     $this->setParams(['row'=>$row,'col'=>$col,'char'=>$char]);
+    # }
+    
+    # Po refaktoryzacji
+        public function __construct(int $row=1, int $col=1, string $char='.', array $params=[])
+        {
+            $this->setParams(['row'=>$row,'col'=>$col,'char'=>$char]);
+        }
+----
+
+.Punkt kontrolny
+[NOTE]
+====
+Program przechodzi testy i działa prawidłowo
+====
+
+Nie możemy jeszcze pozbyć się przekazywanych parametrów, ponieważ instancja klasy Point
+jest używana jako głowa i ciało dla węża w klasie Snake.
+
+Przerabiamy konstruktor klasy Snake, aby używał nowego sposobu ustawiania parametrów wstępnie przekazywanych przez motodę *Point::setParams()*
+
+.Snake::__construct() przed refaktoryzacją
+[source,php]
+----
+    public function __construct(int $boardRows, int $boardCols)
+    {
+        $head = new Point(intval($boardRows / 2), intval($boardCols / 2), Char::block());
+        $this->boardCols = $boardCols;
+        $this->boardRows = $boardRows;
+
+        for ($i = 1;$i < 5;++$i) {
+            $this->points[] = new Point($head->getRow(), $head->getCol() - $i, Char::shadeBlock());
+        }
+        array_unshift($this->points, $head);
+    }
+----
+
+.Snake::__construct() po refaktoryzacji
+[source,php]
+----
+    public function __construct(int $boardRows, int $boardCols)
+    {
+        $head = new Point(); // <1>
+        $head->setParams(['row' => intval($boardRows / 2), 'col' => intval($boardCols / 2), 'char' => Char::block()]);
+        $this->boardCols = $boardCols;
+        $this->boardRows = $boardRows;
+
+        for ($i = 1;$i < 5;++$i) {
+            $body = new Point(); // <2>
+            $body->setParams(['row' => $head->getRow(), 'col' => $head->getCol() - $i, 'char' => Char::shadeBlock()]);
+            $this->points[] = $body;
+        }
+        array_unshift($this->points, $head);
+    }
+----
+<1> Tutaj tworzymy głowę węża, a w następnej linii ustawiamy jej parametry
+<2> Tworzymy ciało węża, a w następnych liniach ustawiamy parametry i przypisujemy do tablicy
+
+podobny zabieg trzeba zastosować w metodzie do zmiany kierunku węża
+
+.Snake::move()
+[source,php]
+----
+    # ...
+    # fragment przed refaktoryzacją
+    # $this->points[0]->setChar(Char::shadeBlock());
+    # $next = new Point($row, $col, Char::block());
+    
+    # fragment po refaktoryzacji
+    $this->points[0]->setChar(Char::shadeBlock());
+    $new_point = new Point(); // <1>
+    $new_point->setParams(['row'=>$row, 'col'=>$col, 'char'=>Char::block()]); // <2>
+    $next = $new_point; // <3>
+    # ...
+----
+<1> Tworzymy nowy segment węża
+<2> Nadajemy mu parametry
+<3> Przypisujemy do tablicy jako nowy segment
+
+.Punkt kontrolny
+[NOTE]
+====
+Program przechodzi testy i działa prawidłowo
+====
+
+Teraz można zmodyfikować konstruktory klas Coin i Bomb aby pozbyć się parametrów
+
+.Bomb::__construct() i Coin::__construct() przed refaktoryzacją
+[source,php]
+----
+    public function __construct(int $row=1, int $col=1)
+    {
+        parent::__construct($row, $col, $this->char);
+    }
+----
+
+.Bomb::__construct() i Coin::__construct() po refaktoryzacji
+[source,php]
+----
+    public function __construct()
+    {
+        parent::__construct();
+        $this->setParams(['char'=>$this->char]);
+    }
+----
+
+Na koniec usuwamy niepotrzebne parametry z metody klasy Point::__construct.
+
+.Punkt kontrolny
+[NOTE]
+====
+Program przechodzi testy i działa prawidłowo
+====
+
+
 .Wnioski końcowe z Refaktoryzacji nr 2
 [TIP]
 ====
 Dzięki przeprowadzonej refaktoryzacji możemy dodać dowolny nowy obiekt na ekranie, posiadający inne właściwości. Rozbudowy możemy dokonać przez dopisanie kodu klasy dziedziczącej po Point, a nie przez zmianę istniejącego kodu. Przed refaktoryzacją program był zamknięty na tego typu zmianę.
 ====
+
 
 
 
