@@ -50,7 +50,7 @@ class Board
         $this->width = $width;
         $this->height = $height;
 
-        $this->snake = new Snake($height, $width);
+        $this->snake[] = new Snake($height, $width);
 
         // Nowy sposób generowania obiektów na ekranie
         $this->randomObjectsOnBoard(new Coin(),1);
@@ -76,25 +76,31 @@ class Board
 
     public function moveSnake(string $input)
     {
-        $this->snake->move($input);
-        $this->checkObjects();
-        $this->applyElements();
+    	foreach ($this->snake as $snake)
+    	{
+    		$snake->move($input);
+    		$this->checkObjects();
+    		$this->applyElements();
+    	}
     }
 
     private function checkObjects()
     {
-        $head = $this->snake->getPoints()[0];
-
-        if (!empty($this->ObjectsOnBoard)) {
-            foreach ($this->ObjectsOnBoard as $index => $object) {
-                if ($head->overlaps($object)) {
-                    $this->snake->advance();
-                    unset($this->ObjectsOnBoard[$index]);
-                    // Nowy sposób generowania obiektów na ekranie
-                    rand(0,1)==0 ? $this->randomObjectsOnBoard(new Coin(),1):$this->randomObjectsOnBoard(new Bomb(),1);
-                }
-            }
-        }
+    	foreach ($this->snake as $snake)
+    	{
+    		$head = $snake->getPoints()[0];
+    		
+    		if (!empty($this->ObjectsOnBoard)) {
+    			foreach ($this->ObjectsOnBoard as $index => $object) {
+    				if ($head->overlaps($object)) {
+    					$snake->advance();
+    					unset($this->ObjectsOnBoard[$index]);
+    					// Nowy sposób generowania obiektów na ekranie
+    					rand(0,1)==0 ? $this->randomObjectsOnBoard(new Coin(),1):$this->randomObjectsOnBoard(new Bomb(),1);
+    				}
+    			}
+    		}
+    	}
     }
 
     /**
@@ -158,17 +164,20 @@ class Board
 
     private function applyElements()
     {
-        $this->map = $this->sourceMap;
-
-        foreach ($this->snake->getPoints() as $point) {
-            $this->applyPoint($point);
-        }
-
-        if (!empty($this->ObjectsOnBoard)) {
-            foreach ($this->ObjectsOnBoard as $object) {
-                $this->applyPoint($object);
-            }
-        }
+    	$this->map = $this->sourceMap;
+    	
+    	foreach ($this->snake as $snake)
+    	{
+    		foreach ($snake->getPoints() as $point) {
+    			$this->applyPoint($point);
+    		}
+    	}
+    	
+    	if (!empty($this->ObjectsOnBoard)) {
+    		foreach ($this->ObjectsOnBoard as $object) {
+    			$this->applyPoint($object);
+    		}
+    	}
     }
 
     /**
