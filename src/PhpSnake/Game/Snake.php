@@ -137,15 +137,15 @@ class Snake
      */
     private function changeDirection(string $input)
     {
-        if ('w' === $input && $this->direction != Direction::DOWN) {
-            $this->direction = Direction::UP;
-        } elseif ('a' === $input && $this->direction != Direction::RIGHT) {
-            $this->direction = Direction::LEFT;
-        } elseif ('s' === $input && $this->direction != Direction::UP) {
-            $this->direction = Direction::DOWN;
-        } elseif ('d' === $input && $this->direction != Direction::LEFT) {
-            $this->direction = Direction::RIGHT;
-        }
+    	if ($this->up === $input && $this->direction != Direction::DOWN) {
+    		$this->direction = Direction::UP;
+    	} elseif ($this->left === $input && $this->direction != Direction::RIGHT) {
+    		$this->direction = Direction::LEFT;
+    	} elseif ($this->down === $input && $this->direction != Direction::UP) {
+    		$this->direction = Direction::DOWN;
+    	} elseif ($this->right === $input && $this->direction != Direction::LEFT) {
+    		$this->direction = Direction::RIGHT;
+    	}
     }
 
     /**
