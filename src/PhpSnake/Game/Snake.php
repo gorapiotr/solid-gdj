@@ -35,14 +35,28 @@ class Snake
      */
     private $lastPoint;
 
+    private $up;
+    
+    private $down;
+    
+    private $left;
+    
+    private $right;
+    
     /**
      * @param int $boardRows
      * @param int $boardCols
      */
-    public function __construct(int $boardRows, int $boardCols)
+    public function __construct(int $boardRows, int $boardCols, int $start_row=10, int $start_col=10, array $control=['up'=>'w','down'=>'s','left'=>'a','right'=>'d'])
     {
+    	// Przypisanie sterowania
+    	$this->up = $control['up'];
+    	$this->down = $control['down'];
+    	$this->left = $control['left'];
+    	$this->right = $control['right'];
+    	
     	$head = new Point();
-    	$head->setParams(['row' => intval($boardRows / 2), 'col' => intval($boardCols / 2), 'char' => Char::block()]);
+    	$head->setParams(['row' => intval($start_row), 'col' => intval($start_col), 'char' => Char::block()]);
     	$this->boardCols = $boardCols;
     	$this->boardRows = $boardRows;
     	
