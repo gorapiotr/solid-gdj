@@ -261,6 +261,11 @@ class Menu
 }
 ----
 
+Po pierwszym etapie refaktoryzacji, okno gry przedstawia się następująco:
+
+.Wygląd menu
+image::po1.jpg[po1]
+
 = Refaktoryzacja 2
 
 Refaktoryzacja ma na celu rozszerzenie możliwości programu o dodawanie dowolnych nowych obiektów na ekranie, dziedziczących właściwości po klasie Point. Obecnie program zakłada na sztywno tworzenie jednego obiektu o nazwie Coin.
@@ -1346,3 +1351,8 @@ Program przechodzi testy i działa prawidłowo
 ====
 Dzięki przeprowadzonej refaktoryzacji możemy dodać dowolną liczbę węży na ekranie, sterowanych za pomocą wybranych klawiszy. Możemy tego dokonać dzięki dodaniu nowego obiektu klasy Snake do kolekcji w konstruktorze klasy Game. W przyszłości można też dziedziczyć po klasie Game i w każdej instancji generować inną liczbę węży-graczy. Przed refaktoryzacją obiekt klasy snake był zamknięty na rozszerzanie kodu.
 ====
+
+Na zakończenie zrzut ekranu z gry z zastosowaniem dowolnej liczby graczy i obiektów.
+
+.Wygląd ekranu gry
+image::po2.jpg[po2]
