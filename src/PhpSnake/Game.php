@@ -6,6 +6,7 @@ namespace PhpSnake;
 
 use PhpSnake\Exception\GameException;
 use PhpSnake\Game\Board;
+use PhpSnake\Game\Snake;
 use PhpSnake\Game\Drawer;
 use PhpSnake\Menu;
 use PhpSnake\MenuComponent;
