@@ -715,7 +715,7 @@ class Board
 [IMPORTANT]
 .Osiągnieto ważny etap
 ====
-Błędów brak, program jest otwarty za dopisanie klasy zeprezentującej nowy obiekt na ekranie.
+Błędów brak, program jest otwarty na dopisanie klasy zeprezentującej nowy obiekt na ekranie.
 ====
 
 Tworzymy nową klasę Bomb
@@ -976,11 +976,373 @@ Program przechodzi testy i działa prawidłowo
 Dzięki przeprowadzonej refaktoryzacji możemy dodać dowolny nowy obiekt na ekranie, posiadający inne właściwości. Rozbudowy możemy dokonać przez dopisanie kodu klasy dziedziczącej po Point, a nie przez zmianę istniejącego kodu. Przed refaktoryzacją program był zamknięty na tego typu zmianę.
 ====
 
+= Refaktoryzacja 3
+
+.Snake::__construct() Przed zmianami
+[source,php]
+----
+    public function __construct(int $boardRows, int $boardCols)
+    {
+    	$head = new Point();
+    	$head->setParams(['row' => intval($boardRows / 2), 'col' => intval($boardCols / 2), 'char' => Char::block()]);
+    	$this->boardCols = $boardCols;
+    	$this->boardRows = $boardRows;
+    	
+    	for ($i = 1;$i < 5;++$i) {
+    		$body = new Point();
+    		$body->setParams(['row' => $head->getRow(), 'col' => $head->getCol() - $i, 'char' => Char::shadeBlock()]);
+    		$this->points[] = $body;
+    	}
+    	array_unshift($this->points, $head);
+    }
+----
+
+.Snake::__construct() Po zmianach
+[source,php]
+----
+    private $up;
+
+    private $down;
+
+    private $left;
+
+    private $right; // <1>
+
+    /**
+     * @param int $boardRows
+     * @param int $boardCols
+     */
+    public function __construct(int $boardRows, int $boardCols, int $start_row=10, int $start_col=10, array $control=['up'=>'w','down'=>'s','left'=>'a','right'=>'d']) // <2>
+    {
+      // Przypisanie sterowania
+      $this->up = $control['up'];
+      $this->down = $control['down'];
+      $this->left = $control['left'];
+      $this->right = $control['right']; // <3>
+
+    	$head = new Point();
+    	$head->setParams(['row' => intval($start_row), 'col' => intval($start_col), 'char' => Char::block()]); // <4>
+    	$this->boardCols = $boardCols;
+    	$this->boardRows = $boardRows;
+
+    	for ($i = 1;$i < 5;++$i) {
+    		$body = new Point();
+    		$body->setParams(['row' => $head->getRow(), 'col' => $head->getCol() - $i, 'char' => Char::shadeBlock()]);
+    		$this->points[] = $body;
+    	}
+    	array_unshift($this->points, $head);
+    }
+----
+<1> Deklaracja zmiennych dla klawiszy sterujących
+<2> Ustawienie domyślnych parametrów, pozycji początkowej i tablicy klawiszy sterujących
+<3> Przypisanie klawiszy do zmiennych instancyjnych
+<4> Początkowa pozycja węża na ekranie
+
+.Punkt kontrolny
+[NOTE]
+====
+Program przechodzi testy i działa prawidłowo
+====
+
+W następnym kroku sprawdzamy jaki klawisz został wciśnięty, porównując ze zdefiniowanymi klawiszami dla obiektu Snake
+
+.Snake::changeDirection Przed zmianami
+[source,php]
+----
+    private function changeDirection(string $input)
+    {
+        if ('w' === $input && $this->direction != Direction::DOWN) {
+            $this->direction = Direction::UP;
+        } elseif ('a' === $input && $this->direction != Direction::RIGHT) {
+            $this->direction = Direction::LEFT;
+        } elseif ('s' === $input && $this->direction != Direction::UP) {
+            $this->direction = Direction::DOWN;
+        } elseif ('d' === $input && $this->direction != Direction::LEFT) {
+            $this->direction = Direction::RIGHT;
+        }
+    }
+----
+
+.Snake::changeDirection po zmianach
+[source,php]
+----
+    private function changeDirection(string $input)
+    {
+    	if ($this->up === $input && $this->direction != Direction::DOWN) {
+    		$this->direction = Direction::UP;
+    	} elseif ($this->left === $input && $this->direction != Direction::RIGHT) {
+    		$this->direction = Direction::LEFT;
+    	} elseif ($this->down === $input && $this->direction != Direction::UP) {
+    		$this->direction = Direction::DOWN;
+    	} elseif ($this->right === $input && $this->direction != Direction::LEFT) {
+    		$this->direction = Direction::RIGHT;
+    	}
+    }
+----
+
+.Punkt kontrolny
+[NOTE]
+====
+Program przechodzi testy i działa prawidłowo
+====
+
+=== Polimorfizm węża
+
+Teraz można przystąpić do zmiany kodu, po którym będziemy mogli tworzyć dowolną liczbę instanji klasy Snake o różnych właściwościach, które zostaną obsłużone przez pozostałe klasy.
+
+.Zmiany w Board::__construct
+[source,php]
+----
+    public function __construct(int $width, int $height)
+    {
+        $this->width = $width;
+        $this->height = $height;
+
+        // Przed
+        // $this->snake = new Snake($height, $width); // <1>
+        // Po refaktoryzacji
+        $this->snake[] = new Snake($height, $width); // <2>
+
+        // Nowy sposób generowania obiektów na ekranie
+        $this->randomObjectsOnBoard(new Coin(),1);
+        $this->randomObjectsOnBoard(new Bomb(),1);
+
+        $this->generateMap();
+        $this->generateOutline();
+        $this->sourceMap = $this->map;
+
+        $this->applyElements();
+    }
+----
+<1> Utworzenie pojedynczego obiektu
+<2> Utworzenie kolekcji obiektów w tablicy
+
+Teraz poprawiamy obsługę poruszania węży, aby obsługiwać wszystkie instancje
+
+.Board::moveSnake() przed zmianami
+[source,php]
+----
+    public function moveSnake(string $input)
+    {
+        $this->snake->move($input);
+        $this->checkObjects();
+        $this->applyElements();
+    }
+----
+
+.Board::moveSnake() po zmianach
+[source,php]
+----
+    public function moveSnake(string $input)
+    {
+        foreach ($this->snake as $snake) // <1>
+        {
+            $snake->move($input);
+            $this->checkObjects();
+            $this->applyElements();
+        }
+    }
+----
+<1> Wykonujemy w pętli operacje na wszystkich obiektach
+
+.Board::checkObjects() przed zmianami
+[source,php]
+----
+    private function checkObjects()
+    {
+        $head = $this->snake->getPoints()[0];
+
+        if (!empty($this->ObjectsOnBoard)) {
+            foreach ($this->ObjectsOnBoard as $index => $object) {
+                if ($head->overlaps($object)) {
+                    $this->snake->advance();
+                    unset($this->ObjectsOnBoard[$index]);
+                    // Nowy sposób generowania obiektów na ekranie
+                    rand(0,1)==0 ? $this->randomObjectsOnBoard(new Coin(),1):$this->randomObjectsOnBoard(new Bomb(),1);
+                }
+            }
+        }
+    }
+----
+
+.Board::checkObjects() przed zmianami
+[source,php]
+----
+    private function checkObjects()
+    {
+        foreach ($this->snake as $snake) // <1>
+        {
+            $head = $snake->getPoints()[0]; // <2>
+
+            if (!empty($this->ObjectsOnBoard)) {
+                foreach ($this->ObjectsOnBoard as $index => $object) {
+                    if ($head->overlaps($object)) {
+                        $snake->advance(); // <3>
+                        unset($this->ObjectsOnBoard[$index]);
+                        // Nowy sposób generowania obiektów na ekranie
+                        rand(0,1)==0 ? $this->randomObjectsOnBoard(new Coin(),1):$this->randomObjectsOnBoard(new Bomb(),1);
+                    }
+                }
+            }
+        }
+    }
+----
+<1> Wykonujemy w pętli operacje na wszystkich obiektach
+<2> odwołujemy się do $snake zamiast $this->snake
+<3> odwołujemy się do $snake zamiast $this->snake
+
+Poniżej analogiczne działanie:
+
+.Board::aplyElements() przed zmianami
+[source,php]
+----
+    private function applyElements()
+    {
+        $this->map = $this->sourceMap;
+
+        foreach ($this->snake->getPoints() as $point) {
+            $this->applyPoint($point);
+        }
+
+        if (!empty($this->ObjectsOnBoard)) {
+            foreach ($this->ObjectsOnBoard as $object) {
+                $this->applyPoint($object);
+            }
+        }
+    }
+----
+
+.Board::aplyElements() po zmianach
+[source,php]
+----
+    private function applyElements()
+    {
+        $this->map = $this->sourceMap;
+
+        foreach ($this->snake as $snake) // <1>
+        {
+            foreach ($snake->getPoints() as $point) { // <3>
+                $this->applyPoint($point);
+            }
+        }
+
+        if (!empty($this->ObjectsOnBoard)) {
+            foreach ($this->ObjectsOnBoard as $object) {
+                $this->applyPoint($object);
+            }
+        }
+    }
+----
+<1> Wykonujemy w pętli operacje na wszystkich obiektach
+<2> odwołujemy się do $snake zamiast $this->snake
+
+.Punkt kontrolny
+[NOTE]
+====
+Program przechodzi testy i działa prawidłowo
+====
+
+=== Zamykamy klasę węża na modyfikacje
+
+Ostatni etap przygotowuje bzpośrednio do otwarcia na dopisywanie nowych instancji klasy Snake. W parametrach konstruktora planszy będziemy przekazywać kolekcję obiektów Snake.
+
+.Board::__construct() przed zmianami
+[source,php]
+----
+    public function __construct(int $width, int $height)
+    {
+        $this->width = $width;
+        $this->height = $height;
+
+        $this->snake[] = new Snake($height, $width);
+
+        // Nowy sposób generowania obiektów na ekranie
+        $this->randomObjectsOnBoard(new Coin(),1);
+        $this->randomObjectsOnBoard(new Bomb(),1);
+
+        $this->generateMap();
+        $this->generateOutline();
+        $this->sourceMap = $this->map;
+
+        $this->applyElements();
+    }
+----
+
+.Board::__construct() po zmianach
+[source,php]
+----
+    public function __construct(int $width, int $height, array $snake) // <1>
+    {
+        $this->width = $width;
+        $this->height = $height;
+
+        $this->snake = $snake; // <2>
+
+        // Nowy sposób generowania obiektów na ekranie
+        $this->randomObjectsOnBoard(new Coin(),1);
+        $this->randomObjectsOnBoard(new Bomb(),1);
+
+        $this->generateMap();
+        $this->generateOutline();
+        $this->sourceMap = $this->map;
+
+        $this->applyElements();
+    }
+----
+<1> Przekazanie kolekcji obiektów w tablicy
+<2> Utworzenie referencji w zmiennej instancyjnej
+
+=== Otwartość na dopisanie kodu
+
+[IMPORTANT]
+.Osiągnieto ważny etap
+====
+Błędów brak, program jest otwarty na dopisanie i utworzenie kolekcji obiektów Snake a następnie przekazanie ich w parametrach do obiektu klasy Board.
+====
+
+.Game::__construct() przed zmianami
+[source,php]
+----
+    public function __construct()
+    {
+        $this->terminal = new Terminal();
+        $this->board = new Board(intval($this->terminal->getWidth() * .7), 20);
+        $this->drawer = new Drawer(STDOUT);
+    }
+----
+
+.Game::__construct() po zmianach
+[source,php]
+----
+    public function __construct()
+    {
+
+        $this->terminal = new Terminal();
+        $board_width = intval($this->terminal->getWidth() * .9);
+        $board_height = 20;
+
+        $snake[] = new Snake($board_height, $board_width, 10, 10, ['up'=>'w','down'=>'s','left'=>'a','right'=>'d']); // <1>
+        $snake[] = new Snake($board_height, $board_width, 30, 30, ['up'=>'i','down'=>'k','left'=>'j','right'=>'l']); // <2>
+
+        $this->board = new Board($board_width, $board_height, $snake); // <3>
+        $this->drawer = new Drawer(STDOUT);
+    }
+----
+<1> Tworzymy pierwszego węża
+<2> Twprzymy drugiego węża
+<3> Przekazujemy tablicę z wężami
+
+Na koniec pożemy wyczyścić domyślne parametry w Snake::__construct()
+
+.Punkt kontrolny
+[NOTE]
+====
+Program przechodzi testy i działa prawidłowo
+====
 
 
-
-
-
-
-
-
+.Wnioski końcowe z Refaktoryzacji nr 3
+[TIP]
+====
+Dzięki przeprowadzonej refaktoryzacji możemy dodać dowolną liczbę węży na ekranie, sterowanych za pomocą wybranych klawiszy. Możemy tego dokonać dzięki dodaniu nowego obiektu klasy Snake do kolekcji w konstruktorze klasy Game. W przyszłości można też dziedziczyć po klasie Game i w każdej instancji generować inną liczbę węży-graczy. Przed refaktoryzacją obiekt klasy snake był zamknięty na rozszerzanie kodu.
+====
