@@ -45,22 +45,22 @@ class Board
      * @param int $width
      * @param int $height
      */
-    public function __construct(int $width, int $height)
+    public function __construct(int $width, int $height, array $snake)
     {
-        $this->width = $width;
-        $this->height = $height;
-
-        $this->snake[] = new Snake($height, $width);
-
-        // Nowy sposób generowania obiektów na ekranie
-        $this->randomObjectsOnBoard(new Coin(),1);
-        $this->randomObjectsOnBoard(new Bomb(),1);
-
-        $this->generateMap();
-        $this->generateOutline();
-        $this->sourceMap = $this->map;
-
-        $this->applyElements();
+    	$this->width = $width;
+    	$this->height = $height;
+    	
+    	$this->snake = $snake;
+    	
+    	// Nowy sposób generowania obiektów na ekranie
+    	$this->randomObjectsOnBoard(new Coin(),1);
+    	$this->randomObjectsOnBoard(new Bomb(),1);
+    	
+    	$this->generateMap();
+    	$this->generateOutline();
+    	$this->sourceMap = $this->map;
+    	
+    	$this->applyElements();
     }
    
     public function randomObjectsOnBoard(Point $Object, int $count)

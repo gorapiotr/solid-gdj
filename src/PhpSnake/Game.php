@@ -30,14 +30,22 @@ class Game
 
     public function __construct()
     {
-        $this->terminal = new Terminal();
-        $this->board = new Board(intval($this->terminal->getWidth() * .7), 20);
-        $this->drawer = new Drawer(STDOUT);
-
-
-        //POWODUJE POJAWIENIE SIE TABLICY
-        //$this->drawBoard();
+    	
+    	$this->terminal = new Terminal();
+    	$board_width = intval($this->terminal->getWidth() * .9);
+    	$board_height = 20;
+    	
+    	$snake[] = new Snake($board_height, $board_width, 10, 10, ['up'=>'w','down'=>'s','left'=>'a','right'=>'d']);
+    	$snake[] = new Snake($board_height, $board_width, 30, 30, ['up'=>'i','down'=>'k','left'=>'j','right'=>'l']);
+    	
+    	$this->board = new Board($board_width, $board_height, $snake);
+    	$this->drawer = new Drawer(STDOUT);
+    	
+    	
+    	//POWODUJE POJAWIENIE SIE TABLICY
+    	//$this->drawBoard();
     }
+    
 
 
 
