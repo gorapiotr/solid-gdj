@@ -20,7 +20,7 @@ Marcin Jaskowski
 
 
 
-
+= Refaktoryzacja 1
 === Przykład 1
 
 Przed refaktoryzacją metoda writeGameOver() była wywoływana bez argumentu. Wypisywała na konsoli informację o końcu gry. Metoda to była zamknięta na zmiany. Po refaktoryzacji metoda może zostać wykorzystana do wypisania dowolnego tekstu na ekranie. Bez paramerów low i column tekst będzie automatycznie wypisywany na środku. Jeśli argumenty zostaną podanę tekst wyświetli się w określonym miejscu. Pozwoli to na wielokrotne wykorzystanie tej metody.
@@ -44,6 +44,7 @@ public function writeGameOver()
     }
 ----
 
+
 ===== Po refaktoryzacji 
 
 [source,php]
@@ -54,20 +55,32 @@ public function writeStringOnBoard($text, $row = NULL , $column = NULL )
         
         if($row == NULL)
             {
-                $row = $this->height / 2;
+                $row = $this->height / 2; <1>
             }
         if($column == NULL)
             {    
-                $column = ($this->width / 2) - ($length / 2);
+                $column = ($this->width / 2) - ($length / 2); <2>
             }
             
         for ($i = 0; $i < $length; ++$i) 
             {
                 $this->map[$row][$column] = $text[$i];
-                ++$column;
+                ++$column; <3>
             }
     }
 ----
+
+<1> Jeżeli parametr nie zostal podany wysokosc okreslona jest jako srodkowy wiersz
+<2> Jeżeli parametr nie zostal podany szerokosc okreslana jest jako srodkowa kolumna
+<3> Wypisywanie testu na ekranie
+
+
+
+[NOTE]
+.Punkt kontrolny
+====
+Przeprowadzone testy nie wykazały błędów, przechodzimy do kolejnego etapu
+====
 
 
 === Przykład 2
@@ -84,19 +97,21 @@ public function run()
      {
         try 
         {
-             while (true) {
-                 $input = $this->terminal->getChar();
+             while (true) {                   
+                 $input = $this->terminal->getChar();  <1>
                  $this->board->moveSnake($input);
                  $this->drawBoard();
                  usleep(60000);
              }
          }
-         catch (GameException $exception)
+         catch (GameException $exception)     <2>
          {
              $this->gameOver();
          }
      }
 ----
+<1> Glowna petla gry
+<2> Obsluga wyjatkow 
 
 
 ===== Główna pętla programu po refaktoryzacji
@@ -110,23 +125,23 @@ public function run()
         {
               system('clear');
                     
-              $menu = new Menu($this->board, $this->terminal);
-              $menu ->addComponentMenu(new MenuComponent('Zadanie','startGame'));
+              $menu = new Menu($this->board, $this->terminal); <1>
+              $menu ->addComponentMenu(new MenuComponent('Zadanie','startGame'));  <2>
               $menu ->addComponentMenu(new MenuComponent('Opcje','newTextSide'));
               $menu ->addComponentMenu(new MenuComponent('Zapisz gre','newTextSide'));
               $menu ->addComponentMenu(new MenuComponent('Wyjscie','endGame'));
                     
-              $menu ->drawMenu();
+              $menu ->drawMenu(); 
               
-              $this->drawBoard();
+              $this->drawBoard(); 
                     
                 while(true)
                     {
-                        $input = $this->terminal->getChar();
+                        $input = $this->terminal->getChar(); 
                     
                         if($input != NULL)
                         {
-                            $menu->interactWithMenu($input);
+                            $menu->interactWithMenu($input); <3>
                         }    
                     }
             }
@@ -137,6 +152,10 @@ public function run()
         }
     }
 ----
+<1> Obiekt menu posiadajacy metody tworzace widok menu
+<2> Wywolanie metody dodajacej nowy komponent menu
+<3> Funkcja wykorzystujaca jako parametr odczytany z klawiatury znak
+
 
 
 ===== Klasa MenuComponent.php(dziedziczy po interfejsie MenuComponentInterface.php)
@@ -183,6 +202,7 @@ class Menu
     
 }
 ----
+Dodawanie nowego opcji w menu do tablicy komponentów menu
 
 [source,php]
 ----
@@ -205,6 +225,7 @@ class Menu
     
 }
 ----
+Wypisanie wszystkich komponentow menu w konsoli.
 
 [source,php]
 ----
@@ -221,30 +242,19 @@ class Menu
              if($oneComponent['key'] == $char)
              {
                 
-                call_user_func(array($this, $oneComponent['functionName']), $oneComponent['name']);
+                call_user_func(array($this, $oneComponent['functionName']), $oneComponent['name']); <1>
              }
         }
     }
     
-    ...
+
+... 
     
-}
-----
-
-[source,php]
-----
-
-//Przykładowa instacja klasy MenuComponent korzystająca z funkcji "interactWithMenu()"
-// Object = new MenuComponent('Zacznij gre','startGame');
-
-
-class Menu
-{
-
-    ...    
+    //Przykładowa instacja klasy MenuComponent korzystająca z funkcji "interactWithMenu()"
+    // Object = new MenuComponent('Zacznij gre','startGame');
         
     ///Rozpoczecie,gry
-    public function startGame()
+    public function startGame() <2>
     {
         while (true)
             {
@@ -260,6 +270,8 @@ class Menu
     
 }
 ----
+<1> Wywolanie funkcji, ktora zostala podana jako drugi parametr obiektu
+<2> Przykad funkcji
 
 Po pierwszym etapie refaktoryzacji, okno gry przedstawia się następująco:
 
