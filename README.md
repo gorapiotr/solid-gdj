@@ -1,3 +1,7 @@
+Raport z refaktoryzacji:
+
+http://gist.asciidoctor.org/?github-my-refactorings/solid-gdj//ref/refactoring.adoc&source-highlighter=highlightjs
+
 # PHP-Snake
 
 Popular snake game implementation in PHP and running in CLI.
