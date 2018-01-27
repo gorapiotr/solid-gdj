@@ -29,24 +29,14 @@ class Game
      */
     private $drawer;
 
-    public function __construct()
+    public function __construct(Terminal $terminal, array $snakes,int $board_width,int $board_height)
     {
-    	
-    	$this->terminal = new Terminal();
-    	$board_width = intval($this->terminal->getWidth() * .9);
-    	$board_height = 20;
-    	
-    	$snake[] = new Snake($board_height, $board_width, 10, 10, ['up'=>'w','down'=>'s','left'=>'a','right'=>'d']);
-    	$snake[] = new Snake($board_height, $board_width, 30, 30, ['up'=>'i','down'=>'k','left'=>'j','right'=>'l']);
-    	
+    	$this->terminal = $terminal;
+      $snake = $snakes;
     	$this->board = new Board($board_width, $board_height, $snake);
     	$this->drawer = new Drawer(STDOUT);
-    	
-    	
-    	//POWODUJE POJAWIENIE SIE TABLICY
-    	//$this->drawBoard();
     }
-    
+
 
 
 
@@ -68,12 +58,12 @@ class Game
                 while(true)
                     {
                         $input = $this->terminal->getChar();
-                    
+
                         if($input != NULL)
                         {
                             $menu->interactWithMenu($input);
                         }
-                        
+
                     }
             }
          catch (GameException $exception) {
@@ -85,7 +75,7 @@ class Game
     public function gameOver()
     {
         $this->board->writeStringOnBoard('Game Over');
-        $this->drawBoard();      
+        $this->drawBoard();
     }
 
     private function drawBoard()
