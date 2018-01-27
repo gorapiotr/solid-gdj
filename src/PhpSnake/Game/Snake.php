@@ -36,13 +36,17 @@ class Snake
     private $lastPoint;
 
     private $up;
-    
+
     private $down;
-    
+
     private $left;
-    
+
     private $right;
-    
+
+    private $start_row;
+
+    private $start_col;
+
     /**
      * @param int $boardRows
      * @param int $boardCols
@@ -54,12 +58,15 @@ class Snake
     	$this->down = $control['down'];
     	$this->left = $control['left'];
     	$this->right = $control['right'];
-    	
+
     	$head = new Point();
     	$head->setParams(['row' => intval($start_row), 'col' => intval($start_col), 'char' => Char::block()]);
     	$this->boardCols = $boardCols;
     	$this->boardRows = $boardRows;
-    	
+
+      $this->start_row = $start_row;
+      $this->start_col = $start_col;
+
     	for ($i = 1;$i < 5;++$i) {
     		$body = new Point();
     		$body->setParams(['row' => $head->getRow(), 'col' => $head->getCol() - $i, 'char' => Char::shadeBlock()]);
@@ -103,9 +110,9 @@ class Snake
         }
 
         $this->points[0]->setChar(Char::shadeBlock());
-        $new_point = new Point(); 
-        $new_point->setParams(['row'=>$row, 'col'=>$col, 'char'=>Char::block()]); 
-        $next = $new_point; 
+        $new_point = new Point();
+        $new_point->setParams(['row'=>$row, 'col'=>$col, 'char'=>Char::block()]);
+        $next = $new_point;
 
         $this->checkCollision($next);
 
@@ -162,6 +169,46 @@ class Snake
     public function getDirection()
     {
         return $this->direction;
+    }
+
+    public function getUp()
+    {
+        return $this->up;
+    }
+
+    public function getDown()
+    {
+        return $this->down;
+    }
+
+    public function getLeft()
+    {
+        return $this->left;
+    }
+
+    public function getRight()
+    {
+        return $this->right;
+    }
+
+    public function getBoardRows()
+    {
+        return $this->boardRows;
+    }
+
+    public function getBoardCols()
+    {
+        return $this->boardCols;
+    }
+
+    public function getStartRow()
+    {
+        return $this->start_row;
+    }
+
+    public function getStartCol()
+    {
+        return $this->start_col;
     }
 
     /**

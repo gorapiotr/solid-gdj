@@ -12,7 +12,7 @@ class BoardTest extends \PHPUnit_Framework_TestCase
 {
     public function testBoardConstruction()
     {
-        $board = new Board($width = 10, $height = 10);
+        $board = new Board($width = 10, $height = 10, $snake=[]);
 
         $this->assertEquals($width, $board->getWidth());
         $this->assertEquals($height, $board->getHeight());
