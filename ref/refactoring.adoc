@@ -27,6 +27,16 @@ Przed przystąpieniem do pracy nad projektem sprawdziliśmy działanie wbudowany
 
 image::testy1.jpg[testy_przed]
 
+=== Diagram klas
+
+Schematyczne ujęcie oczekiwań związanych z wprowadzanymi zmianami.
+
+.Diagram klas przed refaktoryzacją
+image::diagram1.jpg[diagram-przed]
+
+.To chcemy osiągnąć po refaktoryzacjach
+image::diagram2.jpg[diagram-po]
+
 === Przykład 1
 
 Przed refaktoryzacją metoda writeGameOver() była wywoływana bez argumentu. Wypisywała na konsoli informację o końcu gry. Metoda to była zamknięta na zmiany. Po refaktoryzacji metoda może zostać wykorzystana do wypisania dowolnego tekstu na ekranie. Bez paramerów low i column tekst będzie automatycznie wypisywany na środku. Jeśli argumenty zostaną podanę tekst wyświetli się w określonym miejscu. Pozwoli to na wielokrotne wykorzystanie tej metody.
