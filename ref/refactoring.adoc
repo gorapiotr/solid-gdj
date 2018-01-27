@@ -21,6 +21,12 @@ Marcin Jaskowski
 
 
 = Refaktoryzacja 1
+
+=== Testy początkowe
+Przed przystąpieniem do pracy nad projektem sprawdziliśmy działanie wbudowanych testów.
+
+image::testy1.jpg[testy_przed]
+
 === Przykład 1
 
 Przed refaktoryzacją metoda writeGameOver() była wywoływana bez argumentu. Wypisywała na konsoli informację o końcu gry. Metoda to była zamknięta na zmiany. Po refaktoryzacji metoda może zostać wykorzystana do wypisania dowolnego tekstu na ekranie. Bez paramerów low i column tekst będzie automatycznie wypisywany na środku. Jeśli argumenty zostaną podanę tekst wyświetli się w określonym miejscu. Pozwoli to na wielokrotne wykorzystanie tej metody.
@@ -1346,7 +1352,7 @@ Błędów brak, program jest otwarty na dopisanie i utworzenie kolekcji obiektó
     }
 ----
 <1> Tworzymy pierwszego węża
-<2> Twprzymy drugiego węża
+<2> Tworzymy drugiego węża
 <3> Przekazujemy tablicę z wężami
 
 Na koniec pożemy wyczyścić domyślne parametry w Snake::__construct()
@@ -1354,9 +1360,10 @@ Na koniec pożemy wyczyścić domyślne parametry w Snake::__construct()
 .Punkt kontrolny
 [NOTE]
 ====
-Program przechodzi testy i działa prawidłowo
+Program przechodzi testy i działa prawidłowo, dopisaliśmy dodatkowe testy dla zmienionego kodu.
 ====
 
+image::testy2.jpg[testy_koniec]
 
 .Wnioski końcowe z Refaktoryzacji nr 3
 [TIP]
