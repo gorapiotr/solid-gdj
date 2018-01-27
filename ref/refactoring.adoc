@@ -1026,6 +1026,9 @@ Dzięki przeprowadzonej refaktoryzacji możemy dodać dowolny nowy obiekt na ekr
 
 = Refaktoryzacja 3
 
+Kolejna refaktoryzacja ma na celu usamodzielnienie klasy Snake tworzącej obiekt węża, od modułu tworzącego planszę, oraz otwarcie jej otwarcie na tworzenie klas węży o zupełnie innych właściwościach. Dzięki tym zabiegom będzie można tworzyć osobno planszę gry i przekazywać do niej dowolną liczbę instancji graczy.
+Obecnie wąż jest jeden, ma stałe właściwości i przypisane na stałe klawisze sterowania.
+
 .Snake::__construct() Przed zmianami
 [source,php]
 ----
