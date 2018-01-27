@@ -754,14 +754,6 @@ namespace PhpSnake\Game\Board;
 
 class Bomb extends Point
 {
-
-
-    //private $arrayCoin = array("\033[41m\033[37m$\033[0m",
-                               //"\033[43m\033[30m+\033[0m",
-                              //  "\033[44m\033[30m#\033[0m");
-
-
-
     /**
      * @var string
      */
@@ -774,7 +766,6 @@ class Bomb extends Point
      */
     public function __construct(int $row, int $col)
     {
-       //$test= rand(0,2);
         parent::__construct($row, $col, $this->char);
     }
 }
@@ -782,6 +773,8 @@ class Bomb extends Point
 ----
 
 Dopisujemy wywołanie obiektu Bomb na ekranie
+
+.Board::__construct()
 [source,php]
 ----
     public function __construct(int $width, int $height)
@@ -991,6 +984,38 @@ Na koniec usuwamy niepotrzebne parametry z metody klasy Point::__construct.
 ====
 Program przechodzi testy i działa prawidłowo
 ====
+
+=== Analiza otwartości na zmiany po drugiej refaktoryzacji
+
+Dokonano zmiany dzięki której można na planszy tworzyć dowolne obiekty dziedziczące po klasie Point a nie tylko jeden typ obiektu Coin.
+
+Dodatkowo poniższy kod zdradza zapowiedź kolejnej refaktoryzacji.
+
+.Board::__construct() przed zmianami
+[source,php]
+----
+public function __construct()
+{
+    // ...
+    $this->snake = new Snake($height, $width);
+    $this->randomCoins(1); //<1>
+}
+----
+<1> Można było generować na ekranie jeden rodzaj obiektu, dodanie nowego wymagało licznych zmian w kodzie
+
+.Board::__construct() po zmianach
+[source,php]
+----
+public function __construct()
+{
+    // ...
+    $this->snake = new Snake($height, $width);
+    $this->randomObjectsOnBoard(new Coin(),1); //<2>
+    $this->randomObjectsOnBoard(new Bomb(),1); //<2>
+    // ... dowolna liczba innych innych obiektów
+}
+----
+<2> Można dodawać dowolne obiekty do kolekcji, zmian dokonujemy przez dopisanie kodu nowej klasy dziedziczącej.
 
 
 .Wnioski końcowe z Refaktoryzacji nr 2
@@ -1267,7 +1292,7 @@ Program przechodzi testy i działa prawidłowo
 
 === Zamykamy klasę węża na modyfikacje
 
-Ostatni etap przygotowuje bzpośrednio do otwarcia na dopisywanie nowych instancji klasy Snake. W parametrach konstruktora planszy będziemy przekazywać kolekcję obiektów Snake.
+Ostatni etap przygotowuje bezpośrednio do otwarcia na dopisywanie nowych instancji klasy Snake. W parametrach konstruktora planszy będziemy przekazywać kolekcję obiektów Snake.
 
 .Board::__construct() przed zmianami
 [source,php]
@@ -1362,6 +1387,62 @@ Na koniec pożemy wyczyścić domyślne parametry w Snake::__construct()
 ====
 Program przechodzi testy i działa prawidłowo, dopisaliśmy dodatkowe testy dla zmienionego kodu.
 ====
+
+=== Finałowe starcie trzeciej refaktoryzacji
+
+Ostatecznie modyfikujemy parametry konstruktora planszy aby można było przekazać do niego utworzone wcześniej obiekty węży.
+
+.Board::__construct poz zmianach
+[source,php]
+----
+public function __construct(Terminal $terminal, array $snakes,int $board_width,int $board_height)
+{
+	$this->terminal = $terminal;
+    $snake = $snakes;
+	$this->board = new Board($board_width, $board_height, $snake);
+	$this->drawer = new Drawer(STDOUT);
+}
+----
+
+.Snake.php - główny plik gry przed zmianami
+[source,php]
+----
+use PhpSnake\Game;
+
+include 'vendor/autoload.php';
+
+$game = new Game() // <1>
+$game->run();
+----
+<1> Brak możliwości przekazywania obiektów do gry
+
+.Snake.php - główny plik gry po zmianach
+[source,php]
+----
+use PhpSnake\Game;
+use PhpSnake\Game\Snake;
+use PhpSnake\Terminal;
+
+include 'vendor/autoload.php';
+
+# Parametry początkowe okna gry
+$terminal = new Terminal();
+$board_width = intval($terminal->getWidth() * .9);
+$board_height = 20;
+
+# Tworzymy węże
+$snakes[] = new Snake($board_height, $board_width, 10, 10, ['up'=>'w','down'=>'s','left'=>'a','right'=>'d']);
+$snakes[] = new Snake($board_height, $board_width, 30, 30, ['up'=>'i','down'=>'k','left'=>'j','right'=>'l']);
+
+# Inicjowanie opcji gry
+$game = new Game($terminal, $snakes, $board_width, $board_height); //<1>
+
+# Uruchamianie gry
+$game->run();
+----
+<1> Przekazujemy obiekty do gry
+
+Od teraz można dziedziczyć po klasie Snake aby nadać mu nowe właściwości, można też dziedziczyć po klasie Game, aby zmienić zasady gry (otwartość na dopisywanie). Modyfikacji kodu dokonujemy jedynie w pliku Snake.php, który jest głównym modułem uruchamiającym grę.
 
 image::testy2.jpg[testy_koniec]
 
